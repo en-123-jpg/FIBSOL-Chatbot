@@ -1,7 +1,10 @@
 from dotenv import load_dotenv
+from langchain_community.document_loaders import PyPDFLoader
+from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_community.vectorstores import Chroma
 from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_groq import ChatGroq
+import os
 
 load_dotenv()
 
@@ -10,11 +13,36 @@ embeddings = HuggingFaceEmbeddings(
     model_name="sentence-transformers/all-MiniLM-L6-v2"
 )
 
-# Vector DB
-vectordb = Chroma(
-    persist_directory="chroma_db",
-    embedding_function=embeddings
-)
+# Create DB if not exists
+if not os.path.exists("chroma_db"):
+
+    documents = []
+
+    for file in os.listdir("data"):
+        if file.endswith(".pdf"):
+
+            loader = PyPDFLoader(f"data/{file}")
+            documents.extend(loader.load())
+
+    text_splitter = RecursiveCharacterTextSplitter(
+        chunk_size=500,
+        chunk_overlap=50
+    )
+
+    chunks = text_splitter.split_documents(documents)
+
+    vectordb = Chroma.from_documents(
+        documents=chunks,
+        embedding=embeddings,
+        persist_directory="chroma_db"
+    )
+
+else:
+
+    vectordb = Chroma(
+        persist_directory="chroma_db",
+        embedding_function=embeddings
+    )
 
 # Groq model
 llm = ChatGroq(
@@ -55,4 +83,3 @@ Start naturally with:
     response = llm.invoke(prompt)
 
     return response.content
-    print("\n----------------------\n")
