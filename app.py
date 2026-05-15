@@ -8,17 +8,18 @@ import os
 
 load_dotenv()
 
-# Embeddings
+# Embedding model
 embeddings = HuggingFaceEmbeddings(
     model_name="sentence-transformers/all-MiniLM-L6-v2"
 )
 
-# Create DB if not exists
+# Create vector DB if not already present
 if not os.path.exists("chroma_db"):
 
     documents = []
 
     for file in os.listdir("data"):
+
         if file.endswith(".pdf"):
 
             loader = PyPDFLoader(f"data/{file}")
@@ -44,13 +45,14 @@ else:
         embedding_function=embeddings
     )
 
-# Groq model
+# LLM
 llm = ChatGroq(
     model_name="llama-3.1-8b-instant"
 )
 
 def run_agent(query):
 
+    # Normalize query
     query = query.lower()
 
     slang_map = {
@@ -65,33 +67,32 @@ def run_agent(query):
     for slang, proper in slang_map.items():
         query = query.replace(slang, proper)
 
-    docs = vectordb.similarity_search(query, k=2)
+    # Retrieve more relevant chunks
+    docs = vectordb.similarity_search(query, k=5)
 
     context = "\n".join([doc.page_content for doc in docs])
 
+    # Better prompt
     prompt = f"""
-You are a helpful AI assistant for a biofertilizer company.
+You are an AI assistant for a biofertilizer company.
 
-Use ONLY the provided context to answer.
+Answer ONLY using the provided context.
 
-If the information is unavailable, politely say:
-"I’m not sure about that yet, but I can help with questions related to our products and services."
+Rules:
+- Be direct and concise
+- Keep answers under 5 lines unless necessary
+- Do NOT add unnecessary explanations
+- If recommending products, clearly mention product names
+- If asked about crops, mention the suitable products clearly
+- Do NOT make up information
+- If the answer is unavailable, say:
+"I’m not sure about that yet, but I can help with product and crop-related questions."
 
 Context:
 {context}
 
 Question:
 {query}
-
-Answer in a friendly and professional way.
-
-If the answer is long:
-- use bullet points
-- keep it readable
-- avoid huge paragraphs
-
-Start naturally with:
-"I can help with that."
 """
 
     response = llm.invoke(prompt)
