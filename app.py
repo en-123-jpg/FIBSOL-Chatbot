@@ -5,37 +5,28 @@ from langchain_groq import ChatGroq
 
 load_dotenv()
 
-# Embedding model
+# Embeddings
 embeddings = HuggingFaceEmbeddings(
     model_name="sentence-transformers/all-MiniLM-L6-v2"
 )
 
-# Load vector DB
+# Vector DB
 vectordb = Chroma(
     persist_directory="chroma_db",
     embedding_function=embeddings
 )
 
-# Groq LLM
+# Groq model
 llm = ChatGroq(
     model_name="llama-3.1-8b-instant"
 )
 
-print("Biofertilizer Chatbot Ready!")
-print("Type 'exit' to quit.\n")
+def run_agent(query):
 
-while True:
-    query = input("Ask something: ")
-
-    if query.lower() == "exit":
-        break
-
-    # Retrieve relevant chunks
     docs = vectordb.similarity_search(query, k=2)
 
     context = "\n".join([doc.page_content for doc in docs])
 
-    # Prompt
     prompt = f"""
 You are a helpful AI assistant for a biofertilizer company.
 
@@ -43,6 +34,7 @@ Use ONLY the provided context to answer.
 
 If the information is unavailable, politely say:
 "I’m not sure about that yet, but I can help with questions related to our products and services."
+
 Context:
 {context}
 
@@ -62,6 +54,5 @@ Start naturally with:
 
     response = llm.invoke(prompt)
 
-    print("\nAnswer:")
-    print(response.content)
+    return response.content
     print("\n----------------------\n")
