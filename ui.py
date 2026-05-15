@@ -1,4 +1,3 @@
-
 import base64
 import streamlit as st
 from app import run_agent
@@ -10,8 +9,7 @@ st.set_page_config(
     layout="wide"
 )
 
-# LOAD BACKGROUND IMAGE
-
+# FUNCTION TO LOAD IMAGE
 def get_base64(file):
     with open(file, "rb") as f:
         data = f.read()
@@ -23,21 +21,16 @@ bg_image = get_base64("bg.jpg")
 st.markdown(f"""
 <style>
 
-html {{
-    scroll-behavior: smooth;
-}}
-
-/* App Background */
+/* Entire app background */
 .stApp {{
-    background-image: linear-gradient(rgba(0,0,0,0.55), rgba(0,0,0,0.65)),
-    url("data:image/jpg;base64,{bg_image}");
+    background-image: url("data:image/jpg;base64,{bg_image}");
     background-size: cover;
     background-position: center;
     background-attachment: fixed;
     color: white;
 }}
 
-/* Hide streamlit junk */
+/* Hide Streamlit stuff */
 header {{
     visibility: hidden;
 }}
@@ -58,82 +51,49 @@ footer {{
     justify-content: center;
     align-items: center;
     text-align: center;
-    padding: 0 10%;
+    backdrop-filter: blur(3px);
 }}
 
 .hero h1 {{
-    font-size: 82px;
-    margin-bottom: 20px;
+    font-size: 72px;
+    margin-bottom: 10px;
 }}
 
 .hero p {{
     font-size: 24px;
-    max-width: 900px;
-    line-height: 1.8;
+    width: 70%;
+    line-height: 1.6;
 }}
 
-/* Floating chat button */
-.floating-chat {{
-    position: fixed;
-    right: 30px;
-    bottom: 30px;
-    z-index: 999;
-}}
-
-.floating-chat a {{
-    text-decoration: none;
+/* Scroll button */
+.chat-btn {{
+    margin-top: 40px;
     background-color: #22c55e;
     color: white;
-    padding: 16px 24px;
+    padding: 16px 34px;
     border-radius: 999px;
-    font-size: 18px;
-    font-weight: bold;
-    box-shadow: 0 4px 18px rgba(0,0,0,0.35);
+    font-size: 20px;
+    text-decoration: none;
     transition: 0.3s;
 }}
 
-.floating-chat a:hover {{
+.chat-btn:hover {{
     background-color: #16a34a;
     transform: scale(1.05);
 }}
 
-/* Section cards */
-.section-card {{
-    background: rgba(17, 24, 39, 0.75);
-    backdrop-filter: blur(6px);
-    padding: 40px;
-    border-radius: 28px;
-    margin-bottom: 35px;
-    border: 1px solid rgba(255,255,255,0.08);
-}}
-
-.section-card h2 {{
-    color: #4ade80;
-    margin-bottom: 20px;
-}}
-
-.section-card p,
-.section-card li {{
-    font-size: 18px;
-    line-height: 1.8;
-}}
-
-/* Chat area */
-.chat-title {{
-    text-align: center;
+/* Chat section */
+.chat-section {{
     margin-top: 100px;
-    margin-bottom: 40px;
+    padding-bottom: 100px;
 }}
 
-.chat-title h1 {{
-    font-size: 48px;
-}}
-
+/* Messages */
 .user-msg {{
-    background-color: rgba(30,41,59,0.9);
-    padding: 16px 20px;
-    border-radius: 20px;
-    margin-bottom: 18px;
+    background-color: rgba(30,41,59,0.85);
+    padding: 14px 18px;
+    border-radius: 18px;
+    margin-bottom: 14px;
     width: fit-content;
     max-width: 75%;
     margin-left: auto;
@@ -141,11 +101,11 @@ footer {{
 }}
 
 .bot-msg {{
-    padding: 14px 4px;
-    margin-bottom: 26px;
+    padding: 12px 4px;
+    margin-bottom: 24px;
     max-width: 85%;
     font-size: 17px;
-    line-height: 1.9;
+    line-height: 1.8;
 }}
 
 /* Loading animation */
@@ -183,100 +143,29 @@ footer {{
 </style>
 """, unsafe_allow_html=True)
 
-# FLOATING CHAT BUTTON
-st.markdown("""
-<div class="floating-chat">
-    <a href="#chatbot">💬 Chat With Our Bot</a>
-</div>
-""", unsafe_allow_html=True)
-
 # HERO SECTION
 st.markdown("""
 <div class="hero">
     <h1>🌱 FIB-SOL AI</h1>
 
     <p>
-    Revolutionizing sustainable agriculture with advanced microbial formulations,
-    intelligent crop solutions, and AI-powered agricultural assistance.
-    </p>
-</div>
-""", unsafe_allow_html=True)
-
-# OVERVIEW SECTION
-st.markdown("""
-<div class="section-card">
-    <h2>Company Overview</h2>
-
-    <p>
-    FIB-SOL Life Technologies is focused on next-generation biofertilizer and
-    microbial agricultural solutions designed to improve crop productivity,
-    soil health, nutrient uptake, and sustainability.
+    Intelligent biofertilizer assistance powered by AI.
+    Get product recommendations, crop guidance, dosage support,
+    and agricultural insights instantly.
     </p>
 
-    <p>
-    The company specializes in advanced gel-based microbial technology with
-    high microbial payload, long shelf life, and reduced logistics footprint.
-    </p>
-</div>
-""", unsafe_allow_html=True)
-
-# TECHNOLOGY SECTION
-st.markdown("""
-<div class="section-card">
-    <h2>IG4 Technology</h2>
-
-    <ul>
-        <li>High microbial payload formulation technology</li>
-        <li>18+ months stability</li>
-        <li>100% water soluble</li>
-        <li>Reduced logistics and storage costs</li>
-        <li>Flexible microbial combinations</li>
-        <li>Lower contamination risk</li>
-    </ul>
-</div>
-""", unsafe_allow_html=True)
-
-# PRODUCTS SECTION
-st.markdown("""
-<div class="section-card">
-    <h2>Core Products</h2>
-
-    <ul>
-        <li><b>Sakthi Max</b> – Soil nutrition and vegetative growth support</li>
-        <li><b>Surya Max</b> – Flowering and fruiting enhancement</li>
-        <li><b>Nutrigel Plus</b> – Balanced foliar nutrition</li>
-        <li><b>Super-Tri</b> – Natural microbial fungicide</li>
-        <li><b>Super-Soil</b> – Soil disease prevention and immunity support</li>
-    </ul>
-</div>
-""", unsafe_allow_html=True)
-
-# BENEFITS SECTION
-st.markdown("""
-<div class="section-card">
-    <h2>Why FIB-SOL?</h2>
-
-    <ul>
-        <li>Improves nutrient absorption</li>
-        <li>Supports higher crop yield</li>
-        <li>Enhances plant immunity</li>
-        <li>Reduces dependency on chemical fertilizers</li>
-        <li>Eco-friendly and sustainable</li>
-        <li>Supports multiple application methods</li>
-    </ul>
+    <a href="#chatbot">
+        <button class="chat-btn">
+            Chat With Our Bot
+        </button>
+    </a>
 </div>
 """, unsafe_allow_html=True)
 
 # CHAT SECTION
-st.markdown('<div id="chatbot"></div>', unsafe_allow_html=True)
+st.markdown('<div id="chatbot" class="chat-section"></div>', unsafe_allow_html=True)
 
-st.markdown("""
-<div class="chat-title">
-    <h1>💬 FIB-SOL AI Assistant</h1>
-</div>
-""", unsafe_allow_html=True)
-
-# CHAT HISTORY
+# SESSION STATE
 if "messages" not in st.session_state:
     st.session_state.messages = []
 
@@ -296,7 +185,7 @@ for message in st.session_state.messages:
         )
 
 # CHAT INPUT
-prompt = st.chat_input("Ask about crops, dosage, products, soil health...")
+prompt = st.chat_input("Ask about crops, products, dosage...")
 
 # RESPONSE
 if prompt:
