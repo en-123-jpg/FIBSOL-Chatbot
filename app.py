@@ -50,7 +50,19 @@ llm = ChatGroq(
 )
 
 def run_agent(query):
+query = query.lower()
 
+slang_map = {
+    "abt": "about",
+    "u": "you",
+    "ur": "your",
+    "wanna": "want to",
+    "bio fert": "biofertilizer",
+    "prod": "product"
+}
+
+for slang, proper in slang_map.items():
+    query = query.replace(slang, proper)
     docs = vectordb.similarity_search(query, k=2)
 
     context = "\n".join([doc.page_content for doc in docs])
