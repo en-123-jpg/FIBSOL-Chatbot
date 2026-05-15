@@ -334,11 +334,3 @@ if prompt:
         f"<div class='bot-msg'>{response}</div>",
         unsafe_allow_html=True
     )
-
-
-Recommended wallpaper styles:
-
-* futuristic farming
-* green agriculture aesthetics
-* bio-tech fields
-* modern sustainable agriculture
