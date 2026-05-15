@@ -1,8 +1,4 @@
-# Modern FIB-SOL Website Style UI + Better Product Recommendation Prompt
 
-## Replace your ENTIRE `ui.py` with this
-
-```python
 import base64
 import streamlit as st
 from app import run_agent
